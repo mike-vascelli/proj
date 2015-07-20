@@ -18,7 +18,7 @@ describe 'integration testing' do
     end
   end
 
-  it 'for Help page title' do
+  it 'displays the Help page title' do
     visit help_path
     expect(page).to have_title 'Help'
   end
@@ -26,5 +26,38 @@ describe 'integration testing' do
   it 'allows users signup' do
     visit signup_path
     expect(current_url).to eq(signup_url)
+  end
+
+  context 'user creation' do
+    def fill_input(args)
+      args.each do |key, val|
+        fill_in key, with: val
+      end
+    end
+
+    context 'given valid data' do
+      it 'creates a new user' do
+        visit signup_path
+        args = {'Name' => 'Peppe',
+                'Email' => 'marpione@gmail.com',
+                'Password' => 'Peppe123!',
+                'Password Confirmation' => 'Peppe123!'}
+        fill_input(args)
+        total_users = User.count
+        click_on 'Create User'
+        expect(User.count).to eq(total_users + 1)
+      end
+    end
+
+    context 'given incomplete data' do
+      it 'does not create a new user' do
+        visit signup_path
+        args = {'Name' => 'Peppe'}
+        fill_input(args)
+        total_users = User.count
+        click_on 'Create User'
+        expect(User.count).to eq(total_users)
+      end
+    end
   end
 end
